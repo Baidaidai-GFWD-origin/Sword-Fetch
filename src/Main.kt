@@ -15,23 +15,32 @@ enum class HttpMethods(val names: String){
 class HTTPOptions(){
     var methods:String = HttpMethods.get.names
     var body:RequestBody? = null
+    var headers:Headers = Headers.Builder().build()
 
     fun methods(param_methods:HttpMethods?){
         methods = param_methods?.names ?: HttpMethods.get.names
     }
+    fun head(header:Headers.Builder.()->Unit){
+        val _headers = Headers.Builder()
+        _headers.header()
+        headers = _headers.build()
+    }
     fun body(bodies:String?){
         body = bodies?.trimIndent()?.toRequestBody()
     }
+
 }
 
-fun fetch(url: String, options: (HTTPOptions.() -> Unit)?):String{
+fun fetch(url: String,options:HTTPOptions.() -> Unit = {}):String{
     var responseBody:String
     val httpOptions = HTTPOptions()
-    if(options!=null) httpOptions.options()
+    httpOptions.options()
+
+    println(httpOptions.headers)
 
     val request = Request.Builder()
         .url(url)
-        .header("Content-Type","application/json")
+        .headers(httpOptions.headers)
         .method(
             method = httpOptions.methods,
             body = httpOptions.body
